@@ -47,27 +47,32 @@ function recordAction(type, indices) {
 
 function* quicksort(arr, left, right, sorted) {
   if (left < right) {
-    let pivotIdx = right;
-    let pivot = arr[pivotIdx];
-    let i = left;
-    recordAction('pivot', { pivot: pivotIdx, sorted: new Set(sorted) });
-    for (let j = left; j < right; j++) {
-      recordAction('compare', { compare: [j, pivotIdx], pivot: pivotIdx, sorted: new Set(sorted) });
-      if (arr[j] < pivot) {
-        [arr[i], arr[j]] = [arr[j], arr[i]];
-        recordAction('swap', { swap: [i, j], pivot: pivotIdx, sorted: new Set(sorted) });
-        i++;
-      }
-    }
-    [arr[i], arr[pivotIdx]] = [arr[pivotIdx], arr[i]];
-    recordAction('swap', { swap: [i, pivotIdx], pivot: pivotIdx, sorted: new Set(sorted) });
-    sorted.add(i);
-    yield* quicksort(arr, left, i - 1, sorted);
-    yield* quicksort(arr, i + 1, right, sorted);
+    let pivotIdx = partition(arr, left, right, sorted);
+    yield* quicksort(arr, left, pivotIdx - 1, sorted);
+    yield* quicksort(arr, pivotIdx + 1, right, sorted);
   } else if (left === right) {
     sorted.add(left);
     recordAction('sorted', { sorted: new Set(sorted) });
   }
+}
+
+function partition(arr, left, right, sorted) {
+  let pivot = arr[right];
+  let i = left;
+  recordAction('pivot', { pivot: right, sorted: new Set(sorted) });
+  for (let j = left; j < right; j++) {
+    recordAction('compare', { compare: [j, right], pivot: right, sorted: new Set(sorted) });
+    if (arr[j] < pivot) {
+      [arr[i], arr[j]] = [arr[j], arr[i]];
+      recordAction('swap', { swap: [i, j], pivot: right, sorted: new Set(sorted) });
+      i++;
+    }
+  }
+  [arr[i], arr[right]] = [arr[right], arr[i]];
+  recordAction('swap', { swap: [i, right], pivot: right, sorted: new Set(sorted) });
+  sorted.add(i);
+  recordAction('sorted', { sorted: new Set(sorted) });
+  return i;
 }
 
 function prepareActions() {
