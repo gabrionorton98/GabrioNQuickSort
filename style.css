@@ -46,4 +46,36 @@ canvas {
   background: #181818;
   border-radius: 8px;
   box-shadow: 0 2px 12px #0006;
+  margin-bottom: 12px;
+}
+.legend {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 18px;
+  margin-bottom: 18px;
+  font-size: 1rem;
+}
+.legend-bar {
+  display: inline-block;
+  width: 24px;
+  height: 16px;
+  margin-right: 6px;
+  border-radius: 3px;
+  vertical-align: middle;
+}
+.legend-bar.pivot { background: #ff9800; }
+.legend-bar.compare { background: #e91e63; }
+.legend-bar.swap { background: #ffd600; }
+.legend-bar.sorted { background: #2196f3; }
+.legend-bar.default { background: #4caf50; }
+
+#stepBtn, #shuffleBtn {
+  background: #00bcd4;
+}
+#stepBtn:hover, #shuffleBtn:hover {
+  background: #008c9e;
+}
+#sizeRange {
+  width: 100px;
 }

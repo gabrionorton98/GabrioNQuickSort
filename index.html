@@ -12,9 +12,20 @@
     <div class="controls">
       <button id="startBtn">Start</button>
       <button id="pauseBtn">Pause</button>
+      <button id="stepBtn">Step</button>
       <button id="resetBtn">Reset</button>
+      <button id="shuffleBtn">Shuffle</button>
+      <label for="sizeRange">Array Size:</label>
+      <input type="range" id="sizeRange" min="10" max="100" value="40" />
       <label for="speedRange">Speed:</label>
       <input type="range" id="speedRange" min="10" max="1000" value="300" />
+    </div>
+    <div class="legend">
+      <span class="legend-bar pivot"></span> Pivot
+      <span class="legend-bar compare"></span> Compare
+      <span class="legend-bar swap"></span> Swap
+      <span class="legend-bar sorted"></span> Sorted
+      <span class="legend-bar default"></span> Unsorted
     </div>
     <canvas id="sortCanvas" width="800" height="400"></canvas>
   </div>
