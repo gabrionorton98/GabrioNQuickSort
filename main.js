@@ -32,10 +32,12 @@ function drawArray(highlight = {}) {
     ctx.fillStyle = color;
     ctx.fillRect(i * BAR_WIDTH, canvas.height - array[i], BAR_WIDTH - 2, array[i]);
     // Draw value label for clarity
-    ctx.fillStyle = '#fff';
-    ctx.font = '12px Arial';
-    ctx.textAlign = 'center';
-    if (BAR_COUNT <= 30) ctx.fillText(array[i], i * BAR_WIDTH + BAR_WIDTH / 2, canvas.height - array[i] - 8);
+    if (BAR_COUNT <= 30) {
+      ctx.fillStyle = '#fff';
+      ctx.font = '12px Arial';
+      ctx.textAlign = 'center';
+      ctx.fillText(array[i], i * BAR_WIDTH + BAR_WIDTH / 2, canvas.height - array[i] - 8);
+    }
   }
 }
 
@@ -48,7 +50,7 @@ function* quicksort(arr, left, right, sorted) {
     let pivotIdx = right;
     let pivot = arr[pivotIdx];
     let i = left;
-    recordAction('pivot', { pivot: pivotIdx, left: i, right: right, sorted: new Set(sorted) });
+    recordAction('pivot', { pivot: pivotIdx, sorted: new Set(sorted) });
     for (let j = left; j < right; j++) {
       recordAction('compare', { compare: [j, pivotIdx], pivot: pivotIdx, sorted: new Set(sorted) });
       if (arr[j] < pivot) {
@@ -74,6 +76,8 @@ function prepareActions() {
   let sorted = new Set();
   const gen = quicksort(arrCopy, 0, arrCopy.length - 1, sorted);
   for (let _ of gen) {}
+  // At the end, mark all as sorted
+  recordAction('sorted', { sorted: new Set(Array.from({length: arrCopy.length}, (_, i) => i)) });
 }
 
 function reset() {
@@ -99,23 +103,6 @@ function shuffle() {
   paused = false;
 }
 
-function animateAction(action) {
-  return new Promise(resolve => {
-    let progress = 0;
-    const duration = Math.max(80, speed); // minimum duration for smoothness
-    function animate() {
-      progress += 16;
-      drawArray(action);
-      if (progress < duration) {
-        requestAnimationFrame(animate);
-      } else {
-        resolve();
-      }
-    }
-    animate();
-  });
-}
-
 async function play() {
   if (running) return;
   running = true;
@@ -127,9 +114,9 @@ async function play() {
     }
     const action = actions[actionIndex];
     array = action.arr.slice();
-    await animateAction(action);
+    drawArray(action);
     actionIndex++;
-    await new Promise(res => setTimeout(res, Math.max(10, speed / 2)));
+    await new Promise(res => setTimeout(res, Math.max(20, speed / 2)));
   }
   running = false;
 }
