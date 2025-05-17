@@ -76,21 +76,25 @@ function* quicksort(arr, left, right, sorted) {
 
 function prepareActions() {
   actions = [];
-  let arrCopy = array.slice();
+  // Always start with a scrambled array
+  let arrCopy = randomArray();
+  // Save the scrambled array as the initial state
+  actions.push({ type: 'init', arr: arrCopy.slice() });
   let sorted = new Set();
   const gen = quicksort(arrCopy, 0, arrCopy.length - 1, sorted);
   for (let _ of gen) {}
   // At the end, mark all as sorted and update the array
-  recordAction('sorted', { sorted: new Set(Array.from({length: arrCopy.length}, (_, i) => i)) });
+  actions.push({ type: 'sorted', sorted: new Set(Array.from({length: arrCopy.length}, (_, i) => i)), arr: arrCopy.slice() });
   array = arrCopy.slice();
 }
 
 function reset() {
   BAR_COUNT = parseInt(sizeRange.value);
   BAR_WIDTH = canvas.width / BAR_COUNT;
-  array = randomArray();
   prepareActions();
   actionIndex = 0;
+  // Always start with the scrambled state
+  array = actions[0].arr.slice();
   drawArray();
   running = false;
   paused = false;
