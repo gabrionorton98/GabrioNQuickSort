@@ -47,7 +47,7 @@ function recordAction(type, indices) {
 
 function* quicksort(arr, left, right, sorted) {
   if (left < right) {
-    let pivotIdx = partition(arr, left, right, sorted);
+    let pivotIdx = yield* partition(arr, left, right, sorted);
     yield* quicksort(arr, left, pivotIdx - 1, sorted);
     yield* quicksort(arr, pivotIdx + 1, right, sorted);
   } else if (left === right) {
@@ -56,7 +56,7 @@ function* quicksort(arr, left, right, sorted) {
   }
 }
 
-function partition(arr, left, right, sorted) {
+function* partition(arr, left, right, sorted) {
   let pivot = arr[right];
   let i = left;
   recordAction('pivot', { pivot: right, sorted: new Set(sorted) });
@@ -65,11 +65,13 @@ function partition(arr, left, right, sorted) {
     if (arr[j] < pivot) {
       [arr[i], arr[j]] = [arr[j], arr[i]];
       recordAction('swap', { swap: [i, j], pivot: right, sorted: new Set(sorted) });
+      yield;
       i++;
     }
   }
   [arr[i], arr[right]] = [arr[right], arr[i]];
   recordAction('swap', { swap: [i, right], pivot: right, sorted: new Set(sorted) });
+  yield;
   sorted.add(i);
   recordAction('sorted', { sorted: new Set(sorted) });
   return i;
@@ -83,6 +85,8 @@ function prepareActions() {
   for (let _ of gen) {}
   // At the end, mark all as sorted
   recordAction('sorted', { sorted: new Set(Array.from({length: arrCopy.length}, (_, i) => i)) });
+  // Actually update the array to sorted for the final state
+  array = arrCopy.slice();
 }
 
 function reset() {
