@@ -46,17 +46,13 @@ function recordAction(type, indices) {
 }
 
 function* quicksort(arr, left, right, sorted) {
-  if (left < right) {
-    let pivotIdx = yield* partition(arr, left, right, sorted);
-    yield* quicksort(arr, left, pivotIdx - 1, sorted);
-    yield* quicksort(arr, pivotIdx + 1, right, sorted);
-  } else if (left === right) {
-    sorted.add(left);
-    recordAction('sorted', { sorted: new Set(sorted) });
+  if (left >= right) {
+    if (left === right) {
+      sorted.add(left);
+      recordAction('sorted', { sorted: new Set(sorted) });
+    }
+    return;
   }
-}
-
-function* partition(arr, left, right, sorted) {
   let pivot = arr[right];
   let i = left;
   recordAction('pivot', { pivot: right, sorted: new Set(sorted) });
@@ -74,7 +70,8 @@ function* partition(arr, left, right, sorted) {
   yield;
   sorted.add(i);
   recordAction('sorted', { sorted: new Set(sorted) });
-  return i;
+  yield* quicksort(arr, left, i - 1, sorted);
+  yield* quicksort(arr, i + 1, right, sorted);
 }
 
 function prepareActions() {
@@ -83,9 +80,8 @@ function prepareActions() {
   let sorted = new Set();
   const gen = quicksort(arrCopy, 0, arrCopy.length - 1, sorted);
   for (let _ of gen) {}
-  // At the end, mark all as sorted
+  // At the end, mark all as sorted and update the array
   recordAction('sorted', { sorted: new Set(Array.from({length: arrCopy.length}, (_, i) => i)) });
-  // Actually update the array to sorted for the final state
   array = arrCopy.slice();
 }
 
